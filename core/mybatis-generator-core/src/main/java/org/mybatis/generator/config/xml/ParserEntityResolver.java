@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.mybatis.generator.config.xml;
 
 import java.io.IOException;
@@ -29,8 +30,8 @@ import org.xml.sax.SAXException;
 public class ParserEntityResolver implements EntityResolver {
 
     /**
-	 *  
-	 */
+     *
+     */
     public ParserEntityResolver() {
         super();
     }
@@ -51,12 +52,14 @@ public class ParserEntityResolver implements EntityResolver {
             return ins;
         } else if (XmlConstants.MYBATIS_GENERATOR_CONFIG_PUBLIC_ID
                 .equalsIgnoreCase(publicId)) {
-            InputStream is = getClass()
-                    .getClassLoader()
-                    .getResourceAsStream(
-                            "org/mybatis/generator/config/xml/mybatis-generator-config_1_0.dtd"); //$NON-NLS-1$
+            //youzhihao
+            InputStream is;
+            if (systemId.equals("http://mybatis.org/dtd/mybatis-generator-config-yanxuan_1_0.dtd")) {
+                is = getClass().getClassLoader().getResourceAsStream("org/mybatis/generator/config/xml/mybatis-generator-config-yanxuan_1_0.dtd");
+            } else {
+                is = getClass().getClassLoader().getResourceAsStream("org/mybatis/generator/config/xml/mybatis-generator-config_1_0.dtd");
+            }
             InputSource ins = new InputSource(is);
-
             return ins;
         } else {
             return null;

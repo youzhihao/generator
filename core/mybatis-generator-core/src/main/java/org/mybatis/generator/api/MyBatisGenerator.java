@@ -226,7 +226,6 @@ public class MyBatisGenerator {
         generatedXmlFiles.clear();
         ObjectFactory.reset();
         RootClassInfo.reset();
-
         // calculate the contexts to run
         List<Context> contextsToRun;
         if (contextIds == null || contextIds.size() == 0) {

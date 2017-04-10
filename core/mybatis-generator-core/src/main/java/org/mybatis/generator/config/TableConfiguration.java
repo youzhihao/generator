@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.mybatis.generator.config;
 
 import static org.mybatis.generator.internal.util.EqualsUtil.areEqual;
@@ -37,7 +38,7 @@ import org.mybatis.generator.api.dom.xml.XmlElement;
  * @author Jeff Butler
  */
 public class TableConfiguration extends PropertyHolder {
-    
+
     /** The insert statement enabled. */
     private boolean insertStatementEnabled;
 
@@ -62,11 +63,18 @@ public class TableConfiguration extends PropertyHolder {
     /** The update by example statement enabled. */
     private boolean updateByExampleStatementEnabled;
 
+    //youzhihao:增加一个:selectOneByExample
+    private boolean selectOneByExampleStatementEnabled;
+
     /** The column overrides. */
     private List<ColumnOverride> columnOverrides;
 
     /** The ignored columns. */
     private Map<IgnoredColumn, Boolean> ignoredColumns;
+
+    //youzhihao:增加一个均衡字段
+    private Map<BalanceColumn, Boolean> balanceColumns;
+
 
     /** The generated key. */
     private GeneratedKey generatedKey;
@@ -79,40 +87,41 @@ public class TableConfiguration extends PropertyHolder {
 
     /** The catalog. */
     private String catalog;
-    
+
     /** The schema. */
     private String schema;
-    
+
     /** The table name. */
     private String tableName;
-    
+
     /** The domain object name. */
     private String domainObjectName;
-    
+
     /** The alias. */
     private String alias;
-    
+
     /** The model type. */
     private ModelType modelType;
-    
+
     /** The wildcard escaping enabled. */
     private boolean wildcardEscapingEnabled;
-    
+
     /** The configured model type. */
     private String configuredModelType;
-    
+
     /** The delimit identifiers. */
     private boolean delimitIdentifiers;
 
     /** The column renaming rule. */
     private ColumnRenamingRule columnRenamingRule;
-    
+
     /** The is all column delimiting enabled. */
     private boolean isAllColumnDelimitingEnabled;
-    
+
     private String mapperName;
+
     private String sqlProviderName;
-    
+
     private List<IgnoredColumnPattern> ignoredColumnPatterns = new ArrayList<IgnoredColumnPattern>();
 
     /**
@@ -128,7 +137,7 @@ public class TableConfiguration extends PropertyHolder {
 
         columnOverrides = new ArrayList<ColumnOverride>();
         ignoredColumns = new HashMap<IgnoredColumn, Boolean>();
-
+        balanceColumns = new HashMap<BalanceColumn, Boolean>(); //youzhihao
         insertStatementEnabled = true;
         selectByPrimaryKeyStatementEnabled = true;
         selectByExampleStatementEnabled = true;
@@ -233,7 +242,7 @@ public class TableConfiguration extends PropertyHolder {
                 return true;
             }
         }
-        
+
         for (IgnoredColumnPattern ignoredColumnPattern : ignoredColumnPatterns) {
             if (ignoredColumnPattern.matches(columnName)) {
                 return true;
@@ -252,6 +261,13 @@ public class TableConfiguration extends PropertyHolder {
     public void addIgnoredColumn(IgnoredColumn ignoredColumn) {
         ignoredColumns.put(ignoredColumn, Boolean.FALSE);
     }
+
+
+    //youzhihao
+    public void addBalanceColumn(BalanceColumn balanceColumn) {
+        balanceColumns.put(balanceColumn, Boolean.FALSE);
+    }
+
 
     public void addIgnoredColumnPattern(IgnoredColumnPattern ignoredColumnPattern) {
         ignoredColumnPatterns.add(ignoredColumnPattern);
@@ -543,7 +559,7 @@ public class TableConfiguration extends PropertyHolder {
      * This method returns a List of Strings. The values are the columns
      * that were specified to be ignored in the table, but do not exist in the
      * table.
-     * 
+     *
      * @return a List of Strings - the columns that were improperly configured
      *         as ignored columns
      */
@@ -691,7 +707,7 @@ public class TableConfiguration extends PropertyHolder {
             xmlElement
                     .addAttribute(new Attribute("delimitIdentifiers", "true")); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        
+
         if (stringHasValue(mapperName)) {
             xmlElement.addAttribute(new Attribute(
                     "mapperName", mapperName)); //$NON-NLS-1$
@@ -717,7 +733,7 @@ public class TableConfiguration extends PropertyHolder {
                 xmlElement.addElement(ignoredColumn.toXmlElement());
             }
         }
-        
+
         for (IgnoredColumnPattern ignoredColumnPattern : ignoredColumnPatterns) {
             xmlElement.addElement(ignoredColumnPattern.toXmlElement());
         }
@@ -888,6 +904,14 @@ public class TableConfiguration extends PropertyHolder {
     public void setAllColumnDelimitingEnabled(
             boolean isAllColumnDelimitingEnabled) {
         this.isAllColumnDelimitingEnabled = isAllColumnDelimitingEnabled;
+    }
+
+    public boolean isSelectOneByExampleStatementEnabled() {
+        return selectOneByExampleStatementEnabled;
+    }
+
+    public void setSelectOneByExampleStatementEnabled(boolean selectOneByExampleStatementEnabled) {
+        this.selectOneByExampleStatementEnabled = selectOneByExampleStatementEnabled;
     }
 
     public String getMapperName() {

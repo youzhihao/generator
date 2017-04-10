@@ -26,6 +26,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
 package org.mybatis.generator.config.xml;
 
 import static org.mybatis.generator.internal.util.StringUtility.isTrue;
@@ -37,25 +38,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
-import org.mybatis.generator.config.ColumnOverride;
-import org.mybatis.generator.config.ColumnRenamingRule;
-import org.mybatis.generator.config.CommentGeneratorConfiguration;
-import org.mybatis.generator.config.Configuration;
-import org.mybatis.generator.config.ConnectionFactoryConfiguration;
-import org.mybatis.generator.config.Context;
-import org.mybatis.generator.config.GeneratedKey;
-import org.mybatis.generator.config.IgnoredColumn;
-import org.mybatis.generator.config.IgnoredColumnException;
-import org.mybatis.generator.config.IgnoredColumnPattern;
-import org.mybatis.generator.config.JDBCConnectionConfiguration;
-import org.mybatis.generator.config.JavaClientGeneratorConfiguration;
-import org.mybatis.generator.config.JavaModelGeneratorConfiguration;
-import org.mybatis.generator.config.JavaTypeResolverConfiguration;
-import org.mybatis.generator.config.ModelType;
-import org.mybatis.generator.config.PluginConfiguration;
-import org.mybatis.generator.config.PropertyHolder;
-import org.mybatis.generator.config.SqlMapGeneratorConfiguration;
-import org.mybatis.generator.config.TableConfiguration;
+import org.mybatis.generator.config.*;
 import org.mybatis.generator.exception.XMLParserException;
 import org.mybatis.generator.internal.ObjectFactory;
 import org.w3c.dom.Element;
@@ -65,11 +48,13 @@ import org.w3c.dom.NodeList;
 
 /**
  * This class parses configuration files into the new Configuration API
- * 
+ *
  * @author Jeff Butler
  */
 public class MyBatisGeneratorConfigurationParser {
+
     private Properties extraProperties;
+
     private Properties configurationProperties;
 
     public MyBatisGeneratorConfigurationParser(Properties extraProperties) {
@@ -258,6 +243,9 @@ public class MyBatisGeneratorConfigurationParser {
                 .getProperty("enableCountByExample"); //$NON-NLS-1$
         String enableUpdateByExample = attributes
                 .getProperty("enableUpdateByExample"); //$NON-NLS-1$
+        //youzhihao:增加一个enableSelectOneByExample配置解析
+        String enableSelectOneByExample = attributes
+                .getProperty("enableSelectOneByExample"); //$NON-NLS-1$
         String selectByPrimaryKeyQueryId = attributes
                 .getProperty("selectByPrimaryKeyQueryId"); //$NON-NLS-1$
         String selectByExampleQueryId = attributes
@@ -267,7 +255,7 @@ public class MyBatisGeneratorConfigurationParser {
         String delimitIdentifiers = attributes
                 .getProperty("delimitIdentifiers"); //$NON-NLS-1$
         String delimitAllColumns = attributes.getProperty("delimitAllColumns"); //$NON-NLS-1$
-        
+
         String mapperName = attributes.getProperty("mapperName"); //$NON-NLS-1$
         String sqlProviderName = attributes.getProperty("sqlProviderName"); //$NON-NLS-1$
 
@@ -329,7 +317,10 @@ public class MyBatisGeneratorConfigurationParser {
             tc.setUpdateByExampleStatementEnabled(
                     isTrue(enableUpdateByExample));
         }
-
+        //youzhihao
+        if (stringHasValue(enableSelectOneByExample)) {
+            tc.setSelectOneByExampleStatementEnabled(isTrue(enableUpdateByExample));
+        }
         if (stringHasValue(selectByPrimaryKeyQueryId)) {
             tc.setSelectByPrimaryKeyQueryId(selectByPrimaryKeyQueryId);
         }
@@ -353,7 +344,7 @@ public class MyBatisGeneratorConfigurationParser {
         if (stringHasValue(delimitAllColumns)) {
             tc.setAllColumnDelimitingEnabled(isTrue(delimitAllColumns));
         }
-        
+
         if (stringHasValue(mapperName)) {
             tc.setMapperName(mapperName);
         }
@@ -361,7 +352,7 @@ public class MyBatisGeneratorConfigurationParser {
         if (stringHasValue(sqlProviderName)) {
             tc.setSqlProviderName(sqlProviderName);
         }
-        
+
         NodeList nodeList = node.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node childNode = nodeList.item(i);
@@ -376,6 +367,8 @@ public class MyBatisGeneratorConfigurationParser {
                 parseColumnOverride(tc, childNode);
             } else if ("ignoreColumn".equals(childNode.getNodeName())) { //$NON-NLS-1$
                 parseIgnoreColumn(tc, childNode);
+            } else if ("balanceColumn".equals(childNode.getNodeName())) { //youzhihao,$NON-NLS-1$
+                parseBalanceColumn(tc, childNode);
             } else if ("ignoreColumnsByRegex".equals(childNode.getNodeName())) { //$NON-NLS-1$
                 parseIgnoreColumnByRegex(tc, childNode);
             } else if ("generatedKey".equals(childNode.getNodeName())) { //$NON-NLS-1$
@@ -418,7 +411,7 @@ public class MyBatisGeneratorConfigurationParser {
         if (stringHasValue(delimitedColumnName)) {
             co.setColumnNameDelimited(isTrue(delimitedColumnName));
         }
-        
+
         if (stringHasValue(isGeneratedAlways)) {
             co.setGeneratedAlways(Boolean.parseBoolean(isGeneratedAlways));
         }
@@ -468,6 +461,14 @@ public class MyBatisGeneratorConfigurationParser {
         tc.addIgnoredColumn(ic);
     }
 
+    //youzhihao
+    private void parseBalanceColumn(TableConfiguration tc, Node node) {
+        Properties attributes = parseAttributes(node);
+        String column = attributes.getProperty("column"); //$NON-NLS-1$
+        BalanceColumn bc = new BalanceColumn(column);
+        tc.addBalanceColumn(bc);
+    }
+
     private void parseIgnoreColumnByRegex(TableConfiguration tc, Node node) {
         Properties attributes = parseAttributes(node);
         String pattern = attributes.getProperty("pattern"); //$NON-NLS-1$
@@ -489,7 +490,7 @@ public class MyBatisGeneratorConfigurationParser {
 
         tc.addIgnoredColumnPattern(icPattern);
     }
-    
+
     private void parseException(IgnoredColumnPattern icPattern, Node node) {
         Properties attributes = parseAttributes(node);
         String column = attributes.getProperty("column"); //$NON-NLS-1$
@@ -745,7 +746,7 @@ public class MyBatisGeneratorConfigurationParser {
             }
         }
     }
-    
+
     protected void parseConnectionFactory(Context context, Node node) {
         ConnectionFactoryConfiguration connectionFactoryConfiguration = new ConnectionFactoryConfiguration();
 
@@ -776,27 +777,27 @@ public class MyBatisGeneratorConfigurationParser {
      * This method resolve a property from one of the three sources: system properties,
      * properties loaded from the <properties> configuration element, and
      * "extra" properties that may be supplied by the Maven or Ant envireonments.
-     * 
+     *
      * If there is a name collision, system properties take precedence, followed by
      * configuration properties, followed by extra properties.
-     * 
+     *
      * @param key
      * @return the resolved property.  This method will return null if the property is
      *   undefined in any of the sources.
      */
     private String resolveProperty(String key) {
         String property = null;
-    	
+
         property = System.getProperty(key);
-    	
+
         if (property == null) {
             property = configurationProperties.getProperty(key);
         }
-    	
+
         if (property == null) {
             property = extraProperties.getProperty(key);
         }
-    	
+
         return property;
     }
 }

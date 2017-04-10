@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config-yanxuan_1_0.dtd">
+<generatorConfiguration>
+    <classPathEntry location="${class.path.entry}"/>
+    <context id="mybatis-generator-elf" defaultModelType="flat"
+             introspectedColumnImpl="com.netease.mail.yanxuan.generator.example.config.CustomIntrospectedColumn">
+        <plugin type="com.netease.mail.yanxuan.generator.example.config.CustomPluginAdapter"/>
+        <commentGenerator type="com.netease.mail.yanxuan.generator.example.config.CustomCommentGenerator">
+            <property name="suppressAllComments" value="true"/>
+            <property name="suppressDate" value="true"/>
+        </commentGenerator>
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="${jdbc.connection.url}"
+                        userId="${jdbc.username}"
+                        password="${jdbc.password}">
+        </jdbcConnection>
+        <javaTypeResolver type="com.netease.mail.yanxuan.generator.example.config.CustomJavaTypeResolverImpl">
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+        <javaModelGenerator targetProject="${generator.project}" targetPackage="${java.model.generator.package}">
+            <property name="enableSubPackages" value="false"/>
+            <property name="trimStrings" value="false"/>
+        </javaModelGenerator>
+        <sqlMapGenerator targetProject="${generator.project}" targetPackage="${sql.map.generator.package}">
+            <property name="enableSubPackages" value="false"/>
+        </sqlMapGenerator>
+        <javaClientGenerator type="XMLMAPPER" targetProject="${generator.project}"
+                             targetPackage="${java.client.generator.package}">
+            <property name="enableSubPackages" value="false"/>
+        </javaClientGenerator>
+        <!--配置表信息，生成相应文件-->
+        <table schema="pms" tableName="TB_YX_PMS_CONTRACT_SETTLE" domainObjectName="ContractSettle"
+               selectByPrimaryKeyQueryId="id" selectByExampleQueryId="id">
+            <property name="useActualColumnNames" value="false"/>
+            <balanceColumn column="id"/>
+            <balanceColumn column="contractNo"/>
+        </table>
+    </context>
+</generatorConfiguration>
