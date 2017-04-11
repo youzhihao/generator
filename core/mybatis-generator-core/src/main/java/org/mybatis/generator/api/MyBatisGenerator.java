@@ -252,6 +252,7 @@ public class MyBatisGenerator {
         }
         callback.introspectionStarted(totalSteps);
 
+        //根据context,连接数据库，处理对应表，字段映射
         for (Context context : contextsToRun) {
             context.introspectTables(callback, warnings,
                     fullyQualifiedTableNames);

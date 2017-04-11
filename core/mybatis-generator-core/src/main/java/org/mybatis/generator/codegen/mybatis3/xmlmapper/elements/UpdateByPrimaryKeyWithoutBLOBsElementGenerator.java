@@ -62,9 +62,9 @@ public class UpdateByPrimaryKeyWithoutBLOBsElementGenerator extends
 
         Iterator<IntrospectedColumn> iter;
         if (isSimple) {
-            iter = ListUtilities.removeGeneratedAlwaysColumns(introspectedTable.getNonPrimaryKeyColumns()).iterator();
+            iter = ListUtilities.removeGeneratedAlwaysAndBalanceColumns(introspectedTable.getNonPrimaryKeyColumns()).iterator();
         } else {
-            iter = ListUtilities.removeGeneratedAlwaysColumns(introspectedTable.getBaseColumns()).iterator();
+            iter = ListUtilities.removeGeneratedAlwaysAndBalanceColumns(introspectedTable.getBaseColumns()).iterator();
         }
         while (iter.hasNext()) {
             IntrospectedColumn introspectedColumn = iter.next();

@@ -81,6 +81,10 @@ public class IntrospectedColumn {
      */
     protected boolean isGeneratedAlways;
 
+    //youzhihao:是否是均衡字段
+    protected boolean isBalance;
+
+
     /**
      * Constructs a Column definition. This object holds all the information
      * about a column that is required to generate Java objects and SQL maps;
@@ -339,5 +343,13 @@ public class IntrospectedColumn {
 
     public void setGeneratedAlways(boolean isGeneratedAlways) {
         this.isGeneratedAlways = isGeneratedAlways;
+    }
+
+    public boolean isBalance() {
+        return isBalance;
+    }
+
+    public void setBalance(boolean balance) {
+        isBalance = balance;
     }
 }

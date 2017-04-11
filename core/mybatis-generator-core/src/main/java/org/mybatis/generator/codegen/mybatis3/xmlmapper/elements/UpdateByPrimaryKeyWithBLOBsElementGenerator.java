@@ -67,7 +67,7 @@ public class UpdateByPrimaryKeyWithBLOBsElementGenerator extends
         sb.setLength(0);
         sb.append("set "); //$NON-NLS-1$
 
-        Iterator<IntrospectedColumn> iter = ListUtilities.removeGeneratedAlwaysColumns(introspectedTable
+        Iterator<IntrospectedColumn> iter = ListUtilities.removeGeneratedAlwaysAndBalanceColumns(introspectedTable
                 .getNonPrimaryKeyColumns()).iterator();
         while (iter.hasNext()) {
             IntrospectedColumn introspectedColumn = iter.next();

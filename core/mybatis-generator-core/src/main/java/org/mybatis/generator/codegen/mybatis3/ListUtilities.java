@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.mybatis.generator.codegen.mybatis3;
 
 import java.util.ArrayList;
@@ -24,9 +25,9 @@ import org.mybatis.generator.api.IntrospectedColumn;
  * Couple of little utility methods to make dealing with generated always
  * columns easier.  If a column is GENERATED ALWAYS, it should not
  * be references on an insert or update method.
- * 
+ *
  * If a column is identity, it should not be referenced on an insert method.
- *  
+ *
  * TODO - Replace this with Lambdas when we get to Java 8
  * @author Jeff Butler
  *
@@ -37,6 +38,17 @@ public class ListUtilities {
         List<IntrospectedColumn> filteredList = new ArrayList<IntrospectedColumn>();
         for (IntrospectedColumn ic : columns) {
             if (!ic.isGeneratedAlways()) {
+                filteredList.add(ic);
+            }
+        }
+        return filteredList;
+    }
+
+    //移除GeneratedAlways和balance的字段
+    public static List<IntrospectedColumn> removeGeneratedAlwaysAndBalanceColumns(List<IntrospectedColumn> columns) {
+        List<IntrospectedColumn> filteredList = new ArrayList<IntrospectedColumn>();
+        for (IntrospectedColumn ic : removeGeneratedAlwaysColumns(columns)) {
+            if (!ic.isBalance()) {
                 filteredList.add(ic);
             }
         }

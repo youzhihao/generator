@@ -251,6 +251,18 @@ public class TableConfiguration extends PropertyHolder {
 
         return false;
     }
+    //youzhihao:是否是均衡字段
+    public boolean isColumnBalance(String columnName)
+    {
+        for (Map.Entry<BalanceColumn, Boolean> entry : balanceColumns.entrySet()) {
+            BalanceColumn balanceColumn=entry.getKey();
+            if (balanceColumn.getColumnName().equals(columnName)) {
+                entry.setValue(Boolean.TRUE);
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Adds the ignored column.

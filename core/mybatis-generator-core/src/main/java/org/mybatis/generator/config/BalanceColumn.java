@@ -7,7 +7,7 @@ package org.mybatis.generator.config;
 public class BalanceColumn {
 
     /** The column name. */
-    protected String columnName;
+    private String columnName;
 
     public BalanceColumn(String columnName) {
         this.columnName = columnName;

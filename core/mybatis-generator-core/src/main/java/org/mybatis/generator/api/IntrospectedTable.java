@@ -205,6 +205,10 @@ public abstract class IntrospectedTable {
     /** The blob columns. */
     protected List<IntrospectedColumn> blobColumns;
 
+    //youzhihao:均衡字段
+    protected List<IntrospectedColumn> balanceColumns;
+
+
     /** The target runtime. */
     protected TargetRuntime targetRuntime;
 
@@ -1941,5 +1945,13 @@ public abstract class IntrospectedTable {
 
     public void setTableType(String tableType) {
         this.tableType = tableType;
+    }
+
+    public List<IntrospectedColumn> getBalanceColumns() {
+        return balanceColumns;
+    }
+
+    public void setBalanceColumns(List<IntrospectedColumn> balanceColumns) {
+        this.balanceColumns = balanceColumns;
     }
 }

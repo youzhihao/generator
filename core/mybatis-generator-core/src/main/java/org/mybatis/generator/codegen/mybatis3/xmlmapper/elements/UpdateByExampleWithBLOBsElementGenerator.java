@@ -57,7 +57,7 @@ public class UpdateByExampleWithBLOBsElementGenerator extends
         sb.setLength(0);
         sb.append("set "); //$NON-NLS-1$
 
-        Iterator<IntrospectedColumn> iter = ListUtilities.removeGeneratedAlwaysColumns(introspectedTable.getAllColumns())
+        Iterator<IntrospectedColumn> iter = ListUtilities.removeGeneratedAlwaysAndBalanceColumns(introspectedTable.getAllColumns())
                 .iterator();
         while (iter.hasNext()) {
             IntrospectedColumn introspectedColumn = iter.next();
