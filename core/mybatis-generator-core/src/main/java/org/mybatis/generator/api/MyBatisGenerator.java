@@ -264,6 +264,7 @@ public class MyBatisGenerator {
         }
         callback.generationStarted(totalSteps);
 
+        //生成文件的地方
         for (Context context : contextsToRun) {
             context.generateFiles(callback, generatedJavaFiles,
                     generatedXmlFiles, warnings);

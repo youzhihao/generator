@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.mybatis.generator.internal.rules;
 
 import org.mybatis.generator.api.IntrospectedTable;
@@ -25,7 +26,7 @@ import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
  * something is disabled by the default rules, or is disabled by some other
  * plugin, it should not be re-enabled. Therefore, the following pattern of use
  * is recommended:
- * 
+ *
  * <pre>
  * public class MyPlugin extends PluginAdapter {
  *   &#64;Override
@@ -34,12 +35,12 @@ import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
  *     introspectedTable.setRules(myRules);
  *   }
  * }
- * 
+ *
  * public class MyRules extends RulesDelegate (
  *   public MyRules(Rules rules) {
  *     super(rules);
  *   }
- *   
+ *
  *   &#64;Override
  *   public boolean generateInsert() {
  *     boolean rc = super.generateInsert();
@@ -48,16 +49,17 @@ import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
  *       // of the insert method.  We can decide to disable it here
  *       // if needed.
  *     }
- *     
+ *
  *     return rc;
  *   }
  * </pre>
- * 
- * 
+ *
+ *
  * @author Jeff Butler
- * 
+ *
  */
 public class RulesDelegate implements Rules {
+
     protected Rules rules;
 
     public RulesDelegate(Rules rules) {
@@ -170,5 +172,15 @@ public class RulesDelegate implements Rules {
 
     public boolean generateJavaClient() {
         return rules.generateJavaClient();
+    }
+
+    @Override
+    public boolean generateSelectOneByExampleWithoutBLOBs() {
+        return rules.generateSelectOneByExampleWithoutBLOBs();
+    }
+
+    @Override
+    public boolean generateSelectOneByExampleWithBLOBs() {
+        return rules.generateSelectOneByExampleWithBLOBs();
     }
 }

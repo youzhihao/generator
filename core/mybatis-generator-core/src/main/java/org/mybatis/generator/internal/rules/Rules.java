@@ -193,13 +193,21 @@ public interface Rules {
      */
     boolean generateSelectByExampleWithBLOBs();
 
+
+
+     boolean generateSelectOneByExampleWithoutBLOBs();
+     boolean generateSelectOneByExampleWithBLOBs();
+
+
+
+
     /**
-     * Implements the rule for generating an example class. The class should be
-     * generated if the selectByExample or deleteByExample or countByExample
-     * methods are allowed.
-     * 
-     * @return true if the example class should be generated
-     */
+         * Implements the rule for generating an example class. The class should be
+         * generated if the selectByExample or deleteByExample or countByExample
+         * methods are allowed.
+         *
+         * @return true if the example class should be generated
+         */
     boolean generateExampleClass();
 
     boolean generateCountByExample();
