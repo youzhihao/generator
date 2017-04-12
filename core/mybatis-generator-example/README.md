@@ -9,9 +9,6 @@
     c.不需要区分写两套sqlmap.xml
 
 
-
-
-
 使用注意事项:
 1.整体结构分为dao,mapper,sqlmap.xml
     a.dao层代理mapper类，可以使用mapper直接写sql，也可以引用sqlmap.xml的自定义sql

@@ -12,8 +12,11 @@ import java.util.List;
 
 /**
  * Created by youzhihao on 2017/4/11.
- * mybatis3的dao层生成器
- * dao层代理部分非example的mapper方法
+ * mybatis3的dao层生成器:代理非example的mapper方法
+ * 需要配合是用的jar包:
+ * 1.spring-context
+ * 2.spring-beans
+ * 3.mybatis-spring
  */
 public class DAOGenerator extends AbstractJavaClientGenerator {
 
@@ -30,6 +33,12 @@ public class DAOGenerator extends AbstractJavaClientGenerator {
         addNameSpaceStr(daoClass);
         addSqlSessionTemplateField(daoClass);
         addMapperField(daoClass);
+        addInsertMethod(daoClass);
+        addInsertSelectiveMethod(daoClass);
+        addDeleteByPrimaryKeyMethod(daoClass);
+        addUpdateByPrimaryKeyWithoutBLOBsMethod(daoClass);
+        addUpdateByPrimaryKeySelectiveWithoutBLOBsMethod(daoClass);
+        addSelectByPrimaryKeyMethod(daoClass);
         List<CompilationUnit> answer = new ArrayList<CompilationUnit>();
         //如果不生成client或者dao类文件在loader中存在，则不生成dao文件
         if (context.getPlugins().clientGenerated(null, daoClass, introspectedTable) && !isExist(daoClass)) {
@@ -43,9 +52,10 @@ public class DAOGenerator extends AbstractJavaClientGenerator {
         TopLevelClass answer = new TopLevelClass(classType);
         answer.setVisibility(JavaVisibility.PUBLIC);
         answer.addImportedType(introspectedTable.getMyBatis3JavaMapperType());
+        answer.addImportedType(introspectedTable.getBaseRecordType());
         answer.addImportedType("org.springframework.beans.factory.annotation.Autowired");
-
-
+        answer.addImportedType("org.springframework.stereotype.Repository");
+        answer.addAnnotation("@Repository");
         return answer;
     }
 
@@ -73,15 +83,102 @@ public class DAOGenerator extends AbstractJavaClientGenerator {
 
     private void addMapperField(TopLevelClass topLevelClass) {
         Field field = new Field();
-        String poName = introspectedTable.getTableConfiguration().getDomainObjectName();
-        String name = poName.substring(0, 1).toLowerCase() + poName.substring(1) + "Mapper";
-        field.setName(name);
+        field.setName(getMapperName());
         field.setType(new FullyQualifiedJavaType(introspectedTable.getMyBatis3JavaMapperType()));
         field.setVisibility(JavaVisibility.PRIVATE);
         field.addAnnotation("@Autowired");
         topLevelClass.addField(field);
         topLevelClass.addImportedType(field.getType());
     }
+
+
+    private void addInsertMethod(TopLevelClass topLevelClass) {
+        if (introspectedTable.getRules().generateInsert()) {
+            Method method = new Method();
+            method.setName("insert");
+            method.setVisibility(JavaVisibility.PUBLIC);
+            method.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()), getPoName()));
+            method.setReturnType(new FullyQualifiedJavaType("int"));
+            StringBuilder sb = new StringBuilder();
+            sb.append("return " + getMapperName() + ".insert(" + getPoName() + ");");
+            method.addBodyLine(sb.toString());
+            topLevelClass.addMethod(method);
+        }
+    }
+
+    private void addInsertSelectiveMethod(TopLevelClass topLevelClass) {
+        if (introspectedTable.getRules().generateInsertSelective()) {
+            Method method = new Method();
+            method.setName("insertSelective");
+            method.setVisibility(JavaVisibility.PUBLIC);
+            method.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()), getPoName()));
+            method.setReturnType(new FullyQualifiedJavaType("int"));
+            StringBuilder sb = new StringBuilder();
+            sb.append("return " + getMapperName() + ".insertSelective(" + getPoName() + ");");
+            method.addBodyLine(sb.toString());
+            topLevelClass.addMethod(method);
+        }
+    }
+
+
+    private void addDeleteByPrimaryKeyMethod(TopLevelClass topLevelClass) {
+        if (introspectedTable.getRules().generateDeleteByPrimaryKey()) {
+            Method method = new Method();
+            method.setName("deleteByPrimaryKey");
+            method.setVisibility(JavaVisibility.PUBLIC);
+            method.addParameter(new Parameter(new FullyQualifiedJavaType("Long"), "id"));
+            method.setReturnType(new FullyQualifiedJavaType("int"));
+            StringBuilder sb = new StringBuilder();
+            sb.append("return " + getMapperName() + ".deleteByPrimaryKey(id);");
+            method.addBodyLine(sb.toString());
+            topLevelClass.addMethod(method);
+        }
+    }
+
+
+    protected void addUpdateByPrimaryKeyWithoutBLOBsMethod(TopLevelClass topLevelClass) {
+        if (introspectedTable.getRules().generateUpdateByPrimaryKeyWithoutBLOBs()) {
+            Method method = new Method();
+            method.setName("updateByPrimaryKey");
+            method.setVisibility(JavaVisibility.PUBLIC);
+            method.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()), getPoName()));
+            method.setReturnType(new FullyQualifiedJavaType("int"));
+            StringBuilder sb = new StringBuilder();
+            sb.append("return " + getMapperName() + ".updateByPrimaryKey(" + getPoName() + ");");
+            method.addBodyLine(sb.toString());
+            topLevelClass.addMethod(method);
+        }
+    }
+
+
+    private void addUpdateByPrimaryKeySelectiveWithoutBLOBsMethod(TopLevelClass topLevelClass) {
+        if (introspectedTable.getRules().generateUpdateByPrimaryKeyWithoutBLOBs()) {
+            Method method = new Method();
+            method.setName("updateByPrimaryKeySelective");
+            method.setVisibility(JavaVisibility.PUBLIC);
+            method.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()), getPoName()));
+            method.setReturnType(new FullyQualifiedJavaType("int"));
+            StringBuilder sb = new StringBuilder();
+            sb.append("return " + getMapperName() + ".updateByPrimaryKeySelective(" + getPoName() + ");");
+            method.addBodyLine(sb.toString());
+            topLevelClass.addMethod(method);
+        }
+    }
+
+    private void addSelectByPrimaryKeyMethod(TopLevelClass topLevelClass) {
+        if (introspectedTable.getRules().generateSelectByPrimaryKey()) {
+            Method method = new Method();
+            method.setName("selectByPrimaryKey");
+            method.setVisibility(JavaVisibility.PUBLIC);
+            method.addParameter(new Parameter(new FullyQualifiedJavaType("Long"), "id"));
+            method.setReturnType(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()));
+            StringBuilder sb = new StringBuilder();
+            sb.append("return " + getMapperName() + ".selectByPrimaryKey(id);");
+            method.addBodyLine(sb.toString());
+            topLevelClass.addMethod(method);
+        }
+    }
+
 
     private boolean isExist(TopLevelClass topLevelClass) {
         //client接口类不需要每次生成，如果有就不生成
@@ -93,78 +190,18 @@ public class DAOGenerator extends AbstractJavaClientGenerator {
         return true;
     }
 
-
-    protected Interface getInterfaceShell() {
-        Interface answer = new Interface(new FullyQualifiedJavaType(introspectedTable.getDAOInterfaceType()));
-        answer.setVisibility(JavaVisibility.PUBLIC);
-        context.getCommentGenerator().addJavaFileComment(answer);
-        return answer;
+    private String getMapperName() {
+        String poName = introspectedTable.getTableConfiguration().getDomainObjectName();
+        String name = poName.substring(0, 1).toLowerCase() + poName.substring(1) + "Mapper";
+        return name;
     }
 
-    protected void addSelectByPrimaryKeyMethod(TopLevelClass topLevelClass,
-                                               Interface interfaze) {
-        if (introspectedTable.getRules().generateSelectByPrimaryKey()) {
-            AbstractDAOElementGenerator methodGenerator = new org.mybatis.generator.codegen.ibatis2.dao.elements.SelectByPrimaryKeyMethodGenerator();
-            initializeAndExecuteGenerator(methodGenerator, topLevelClass,
-                    interfaze);
-        }
+    private String getPoName() {
+        String poName = introspectedTable.getTableConfiguration().getDomainObjectName();
+        String name = poName.substring(0, 1).toLowerCase() + poName.substring(1);
+        return name;
     }
 
-
-    protected void addDeleteByPrimaryKeyMethod(TopLevelClass topLevelClass,
-                                               Interface interfaze) {
-        if (introspectedTable.getRules().generateDeleteByPrimaryKey()) {
-            AbstractDAOElementGenerator methodGenerator = new org.mybatis.generator.codegen.ibatis2.dao.elements.DeleteByPrimaryKeyMethodGenerator();
-            initializeAndExecuteGenerator(methodGenerator, topLevelClass,
-                    interfaze);
-        }
-    }
-
-    protected void addInsertMethod(TopLevelClass topLevelClass,
-                                   Interface interfaze) {
-        if (introspectedTable.getRules().generateInsert()) {
-            AbstractDAOElementGenerator methodGenerator = new org.mybatis.generator.codegen.ibatis2.dao.elements.InsertMethodGenerator();
-            initializeAndExecuteGenerator(methodGenerator, topLevelClass,
-                    interfaze);
-        }
-    }
-
-    protected void addInsertSelectiveMethod(TopLevelClass topLevelClass,
-                                            Interface interfaze) {
-        if (introspectedTable.getRules().generateInsertSelective()) {
-            AbstractDAOElementGenerator methodGenerator = new org.mybatis.generator.codegen.ibatis2.dao.elements.InsertSelectiveMethodGenerator();
-            initializeAndExecuteGenerator(methodGenerator, topLevelClass,
-                    interfaze);
-        }
-    }
-
-    protected void addUpdateByPrimaryKeySelectiveMethod(
-            TopLevelClass topLevelClass, Interface interfaze) {
-        if (introspectedTable.getRules().generateUpdateByPrimaryKeySelective()) {
-            AbstractDAOElementGenerator methodGenerator = new org.mybatis.generator.codegen.ibatis2.dao.elements.UpdateByPrimaryKeySelectiveMethodGenerator();
-            initializeAndExecuteGenerator(methodGenerator, topLevelClass,
-                    interfaze);
-        }
-    }
-
-    protected void addUpdateByPrimaryKeyWithBLOBsMethod(
-            TopLevelClass topLevelClass, Interface interfaze) {
-        if (introspectedTable.getRules().generateUpdateByPrimaryKeyWithBLOBs()) {
-            AbstractDAOElementGenerator methodGenerator = new org.mybatis.generator.codegen.ibatis2.dao.elements.UpdateByPrimaryKeyWithBLOBsMethodGenerator();
-            initializeAndExecuteGenerator(methodGenerator, topLevelClass,
-                    interfaze);
-        }
-    }
-
-    protected void addUpdateByPrimaryKeyWithoutBLOBsMethod(
-            TopLevelClass topLevelClass, Interface interfaze) {
-        if (introspectedTable.getRules()
-                .generateUpdateByPrimaryKeyWithoutBLOBs()) {
-            AbstractDAOElementGenerator methodGenerator = new org.mybatis.generator.codegen.ibatis2.dao.elements.UpdateByPrimaryKeyWithoutBLOBsMethodGenerator();
-            initializeAndExecuteGenerator(methodGenerator, topLevelClass,
-                    interfaze);
-        }
-    }
 
     protected void initializeAndExecuteGenerator(
             AbstractDAOElementGenerator methodGenerator,
