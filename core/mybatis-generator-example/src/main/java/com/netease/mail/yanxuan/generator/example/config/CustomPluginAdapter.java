@@ -37,15 +37,7 @@ public class CustomPluginAdapter extends PluginAdapter {
 
     @Override
     public boolean clientGenerated(Interface interfaze, TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
-        //client接口类不需要每次生成，如果有就不生成
-        String classPath = interfaze.getType().getFullyQualifiedName().replace(".", "/") + ".class";
-        URL url = GeneratorRun.class.getClassLoader().getResource(classPath);
-        if (url == null) {
-            selectByPrimaryKeyLockedMethod(interfaze);
-            selectOneByExampleMethod(interfaze);
-            return true;
-        }
-        return false;
+        return true;
     }
 
     @Override

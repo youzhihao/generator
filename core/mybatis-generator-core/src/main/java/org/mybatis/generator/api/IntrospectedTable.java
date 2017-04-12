@@ -26,15 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.mybatis.generator.config.Context;
-import org.mybatis.generator.config.GeneratedKey;
-import org.mybatis.generator.config.JavaClientGeneratorConfiguration;
-import org.mybatis.generator.config.JavaModelGeneratorConfiguration;
-import org.mybatis.generator.config.ModelType;
-import org.mybatis.generator.config.PropertyHolder;
-import org.mybatis.generator.config.PropertyRegistry;
-import org.mybatis.generator.config.SqlMapGeneratorConfiguration;
-import org.mybatis.generator.config.TableConfiguration;
+import org.mybatis.generator.config.*;
 import org.mybatis.generator.internal.rules.ConditionalModelRules;
 import org.mybatis.generator.internal.rules.FlatModelRules;
 import org.mybatis.generator.internal.rules.HierarchicalModelRules;
@@ -181,7 +173,9 @@ public abstract class IntrospectedTable {
         ATTR_MYBATIS3_UPDATE_BY_EXAMPLE_WHERE_CLAUSE_ID,
 
         /** The ATT r_ mybati s3_ sq l_ provide r_ type. */
-        ATTR_MYBATIS3_SQL_PROVIDER_TYPE
+        ATTR_MYBATIS3_SQL_PROVIDER_TYPE,
+        //youzhihao:增加一个dao的类型
+        ATTR_MYBATIS3_DAO_TYPE
     }
 
     /** The table configuration. */
@@ -768,6 +762,8 @@ public abstract class IntrospectedTable {
      */
     public void initialize() {
         calculateJavaClientAttributes();
+        //youzhihao:增加一个dao的属性生成
+        calculateJavaDaoAttributes();
         calculateModelAttributes();
         calculateXmlAttributes();
 
@@ -1239,6 +1235,7 @@ public abstract class IntrospectedTable {
         return internalAttributes
                 .get(InternalAttribute.ATTR_SELECT_BY_EXAMPLE_STATEMENT_ID);
     }
+
     //youzhihao:增加一个selectOneByExample
     public String getSelectOneByExampleStatementId() {
         return internalAttributes
@@ -1319,6 +1316,22 @@ public abstract class IntrospectedTable {
         return sb.toString();
     }
 
+    protected String calculateJavaDaoImplementationPackage() {
+        JavaDaoGeneratorConfiguration config = context.getJavaDaoGeneratorConfiguration();
+        if (config == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        if (stringHasValue(config.getImplementationPackage())) {
+            sb.append(config.getImplementationPackage());
+        } else {
+            sb.append(config.getTargetPackage());
+        }
+
+        sb.append(fullyQualifiedTable.getSubPackageForClientOrSqlMap(isSubPackagesEnabled(config)));
+        return sb.toString();
+    }
+
     /**
      * Checks if is sub packages enabled.
      *
@@ -1393,6 +1406,20 @@ public abstract class IntrospectedTable {
             sb.append("SqlProvider"); //$NON-NLS-1$
         }
         setMyBatis3SqlProviderType(sb.toString());
+    }
+
+    //youzhihao:生成dao文件的类名绝对路径
+    protected void calculateJavaDaoAttributes() {
+        if (context.getJavaDaoGeneratorConfiguration() == null) {
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(calculateJavaDaoImplementationPackage());
+        sb.append('.');
+        sb.append(fullyQualifiedTable.getDomainObjectName());
+        sb.append("Dao"); //$NON-NLS-1$
+        setDAOImplementationType(sb.toString());
+        internalAttributes.put(InternalAttribute.ATTR_MYBATIS3_DAO_TYPE, sb.toString());
     }
 
     /**
@@ -1830,6 +1857,12 @@ public abstract class IntrospectedTable {
     public String getMyBatis3JavaMapperType() {
         return internalAttributes
                 .get(InternalAttribute.ATTR_MYBATIS3_JAVA_MAPPER_TYPE);
+    }
+
+    //youzhihao
+    public String getMyBatis3JavaDaoType() {
+        return internalAttributes.get(InternalAttribute.ATTR_MYBATIS3_DAO_TYPE);
+
     }
 
     /**

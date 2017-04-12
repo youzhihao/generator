@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.mybatis.generator.config;
 
 import static org.mybatis.generator.internal.util.StringUtility.composeFullyQualifiedTableName;
@@ -49,13 +50,13 @@ import org.mybatis.generator.internal.db.DatabaseIntrospector;
  * @author Jeff Butler
  */
 public class Context extends PropertyHolder {
-    
+
     /** The id. */
     private String id;
 
     /** The jdbc connection configuration. */
     private JDBCConnectionConfiguration jdbcConnectionConfiguration;
-    
+
     private ConnectionFactoryConfiguration connectionFactoryConfiguration;
 
     /** The sql map generator configuration. */
@@ -69,6 +70,9 @@ public class Context extends PropertyHolder {
 
     /** The java client generator configuration. */
     private JavaClientGeneratorConfiguration javaClientGeneratorConfiguration;
+
+    //youzhihao:增加一个javaDao配置文件的解析器
+    private JavaDaoGeneratorConfiguration javaDaoGeneratorConfiguration;
 
     /** The table configurations. */
     private ArrayList<TableConfiguration> tableConfigurations;
@@ -102,16 +106,16 @@ public class Context extends PropertyHolder {
 
     /** The auto delimit keywords. */
     private Boolean autoDelimitKeywords;
-    
+
     /** The java formatter. */
     private JavaFormatter javaFormatter;
-    
+
     /** The xml formatter. */
     private XmlFormatter xmlFormatter;
-    
+
     /**
      * Constructs a Context object.
-     * 
+     *
      * @param defaultModelType
      *            - may be null
      */
@@ -217,7 +221,7 @@ public class Context extends PropertyHolder {
         } else {
             connectionFactoryConfiguration.validate(errors);
         }
-            
+
         if (javaModelGeneratorConfiguration == null) {
             errors.add(getString("ValidationError.8", id)); //$NON-NLS-1$
         } else {
@@ -234,7 +238,7 @@ public class Context extends PropertyHolder {
         } catch (Exception e) {
             errors.add(getString("ValidationError.25", id)); //$NON-NLS-1$
         }
-        
+
         if (it != null && it.requiresXMLGenerator()) {
             if (sqlMapGeneratorConfiguration == null) {
                 errors.add(getString("ValidationError.9", id)); //$NON-NLS-1$
@@ -286,6 +290,15 @@ public class Context extends PropertyHolder {
     public void setJavaClientGeneratorConfiguration(
             JavaClientGeneratorConfiguration javaClientGeneratorConfiguration) {
         this.javaClientGeneratorConfiguration = javaClientGeneratorConfiguration;
+    }
+
+
+    public void setJavaDaoGeneratorConfiguration(JavaDaoGeneratorConfiguration javaDaoGeneratorConfiguration) {
+        this.javaDaoGeneratorConfiguration = javaDaoGeneratorConfiguration;
+    }
+
+    public JavaDaoGeneratorConfiguration getJavaDaoGeneratorConfiguration() {
+        return javaDaoGeneratorConfiguration;
     }
 
     /**
@@ -345,14 +358,14 @@ public class Context extends PropertyHolder {
      * Builds an XmlElement representation of this context. Note that the XML
      * may not necessarily validate if the context is invalid. Call the
      * <code>validate</code> method to check validity of this context.
-     * 
+     *
      * @return the XML representation of this context
      */
     public XmlElement toXmlElement() {
         XmlElement xmlElement = new XmlElement("context"); //$NON-NLS-1$
-        
+
         xmlElement.addAttribute(new Attribute("id", id)); //$NON-NLS-1$
-        
+
         if (defaultModelType != ModelType.CONDITIONAL) {
             xmlElement.addAttribute(new Attribute(
                     "defaultModelType", defaultModelType.getModelType())); //$NON-NLS-1$
@@ -369,7 +382,7 @@ public class Context extends PropertyHolder {
         }
 
         addPropertyXmlElements(xmlElement);
-        
+
         for (PluginConfiguration pluginConfiguration : pluginConfigurations) {
             xmlElement.addElement(pluginConfiguration.toXmlElement());
         }
@@ -479,7 +492,7 @@ public class Context extends PropertyHolder {
 
         return javaFormatter;
     }
-    
+
     /**
      * Gets the xml formatter.
      *
@@ -492,7 +505,7 @@ public class Context extends PropertyHolder {
 
         return xmlFormatter;
     }
-    
+
     /**
      * Gets the comment generator configuration.
      *
@@ -595,7 +608,7 @@ public class Context extends PropertyHolder {
     /**
      * Introspect tables based on the configuration specified in the
      * constructor. This method is long running.
-     * 
+     *
      * @param callback
      *            a progress callback if progress information is desired, or
      *            <code>null</code>
@@ -609,7 +622,7 @@ public class Context extends PropertyHolder {
      *            "bar", then the fully qualified table name is "foo.bar". If
      *            the Set is null or empty, then all tables in the configuration
      *            will be used for code generation.
-     * 
+     *
      * @throws SQLException
      *             if some error arises while introspecting the specified
      *             database tables.
@@ -617,7 +630,7 @@ public class Context extends PropertyHolder {
      *             if the progress callback reports a cancel
      */
     public void introspectTables(ProgressCallback callback,
-            List<String> warnings, Set<String> fullyQualifiedTableNames)
+                                 List<String> warnings, Set<String> fullyQualifiedTableNames)
             throws SQLException, InterruptedException {
 
         introspectedTables = new ArrayList<IntrospectedTable>();
@@ -635,7 +648,7 @@ public class Context extends PropertyHolder {
 
             for (TableConfiguration tc : tableConfigurations) {
                 String tableName = composeFullyQualifiedTableName(tc.getCatalog(), tc
-                                .getSchema(), tc.getTableName(), '.');
+                        .getSchema(), tc.getTableName(), '.');
 
                 if (fullyQualifiedTableNames != null
                         && fullyQualifiedTableNames.size() > 0
@@ -695,8 +708,8 @@ public class Context extends PropertyHolder {
      *             the interrupted exception
      */
     public void generateFiles(ProgressCallback callback,
-            List<GeneratedJavaFile> generatedJavaFiles,
-            List<GeneratedXmlFile> generatedXmlFiles, List<String> warnings)
+                              List<GeneratedJavaFile> generatedJavaFiles,
+                              List<GeneratedXmlFile> generatedXmlFiles, List<String> warnings)
             throws InterruptedException {
 
         pluginAggregator = new PluginAggregator();
@@ -749,7 +762,7 @@ public class Context extends PropertyHolder {
         } else {
             connectionFactory = ObjectFactory.createConnectionFactory(this);
         }
-        
+
         return connectionFactory.getConnection();
     }
 

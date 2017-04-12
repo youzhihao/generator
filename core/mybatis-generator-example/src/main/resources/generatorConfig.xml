@@ -30,6 +30,11 @@
                              targetPackage="${java.client.generator.package}">
             <property name="enableSubPackages" value="false"/>
         </javaClientGenerator>
+        <javaDaoGenerator targetProject="${generator.project}"
+                             targetPackage="${java.dao.generator.package}">
+            <property name="enableSubPackages" value="false"/>
+        </javaDaoGenerator>
+
         <!--配置表信息，生成相应文件-->
         <table schema="pms" tableName="TB_YX_PMS_CONTRACT_SETTLE" domainObjectName="ContractSettle"
                selectByPrimaryKeyQueryId="id" selectByExampleQueryId="id">

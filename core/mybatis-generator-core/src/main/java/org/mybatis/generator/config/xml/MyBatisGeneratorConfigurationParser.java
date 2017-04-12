@@ -186,7 +186,10 @@ public class MyBatisGeneratorConfigurationParser {
                 parseSqlMapGenerator(context, childNode);
             } else if ("javaClientGenerator".equals(childNode.getNodeName())) { //$NON-NLS-1$
                 parseJavaClientGenerator(context, childNode);
-            } else if ("table".equals(childNode.getNodeName())) { //$NON-NLS-1$
+            } else if("javaDaoGenerator".equals(childNode.getNodeName())) {//youzhihao:增加一个javaDao配置文件的解析器
+                parseJavaDaoGenerator(context, childNode);
+            }
+            else if ("table".equals(childNode.getNodeName())) { //$NON-NLS-1$
                 parseTable(context, childNode);
             }
         }
@@ -601,32 +604,48 @@ public class MyBatisGeneratorConfigurationParser {
 
     private void parseJavaClientGenerator(Context context, Node node) {
         JavaClientGeneratorConfiguration javaClientGeneratorConfiguration = new JavaClientGeneratorConfiguration();
-
         context.setJavaClientGeneratorConfiguration(javaClientGeneratorConfiguration);
-
         Properties attributes = parseAttributes(node);
         String type = attributes.getProperty("type"); //$NON-NLS-1$
         String targetPackage = attributes.getProperty("targetPackage"); //$NON-NLS-1$
         String targetProject = attributes.getProperty("targetProject"); //$NON-NLS-1$
-        String implementationPackage = attributes
-                .getProperty("implementationPackage"); //$NON-NLS-1$
-
+        String implementationPackage = attributes.getProperty("implementationPackage"); //$NON-NLS-1$
         javaClientGeneratorConfiguration.setConfigurationType(type);
         javaClientGeneratorConfiguration.setTargetPackage(targetPackage);
         javaClientGeneratorConfiguration.setTargetProject(targetProject);
-        javaClientGeneratorConfiguration
-                .setImplementationPackage(implementationPackage);
-
+        javaClientGeneratorConfiguration.setImplementationPackage(implementationPackage);
         NodeList nodeList = node.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node childNode = nodeList.item(i);
-
             if (childNode.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
-
             if ("property".equals(childNode.getNodeName())) { //$NON-NLS-1$
                 parseProperty(javaClientGeneratorConfiguration, childNode);
+            }
+        }
+    }
+    //youzhihao:增加一个javaDao配置文件的解析器
+    private void parseJavaDaoGenerator(Context context, Node node) {
+        JavaDaoGeneratorConfiguration javaDaoGeneratorConfiguration = new JavaDaoGeneratorConfiguration();
+        context.setJavaDaoGeneratorConfiguration(javaDaoGeneratorConfiguration);
+        Properties attributes = parseAttributes(node);
+        String type = attributes.getProperty("type"); //$NON-NLS-1$
+        String targetPackage = attributes.getProperty("targetPackage"); //$NON-NLS-1$
+        String targetProject = attributes.getProperty("targetProject"); //$NON-NLS-1$
+        String implementationPackage = attributes.getProperty("implementationPackage"); //$NON-NLS-1$
+        javaDaoGeneratorConfiguration.setConfigurationType(type);
+        javaDaoGeneratorConfiguration.setTargetPackage(targetPackage);
+        javaDaoGeneratorConfiguration.setTargetProject(targetProject);
+        javaDaoGeneratorConfiguration.setImplementationPackage(implementationPackage);
+        NodeList nodeList = node.getChildNodes();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node childNode = nodeList.item(i);
+            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            if ("property".equals(childNode.getNodeName())) { //$NON-NLS-1$
+                parseProperty(javaDaoGeneratorConfiguration, childNode);
             }
         }
     }
